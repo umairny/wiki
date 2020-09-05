@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django import forms
 from . import util
 from random import randint
@@ -39,12 +39,12 @@ def search(request):
                 'title': query,
                 }
             return render(request, "encyclopedia/entry.html", context)
-            if query in entry:
-                searchlist.append(entry)
-                context = {
-                    'searchlist': searchlist
-                }
-                return render(request, "encyclopedia/search.html", context)
+        for i in entries:      
+            if re.search(query, i.lower()):
+                searchlist.append(i)
+                return render(request, "encyclopedia/search.html", {
+                    "entries": searchlist
+                })
         else:
             return render(request, "encyclopedia/error.html", {"message": "The search result not found Try again"})
     else:
@@ -66,25 +66,15 @@ def entry(request, title):
 #Creat New page entry
 def add_page(request):
     if request.method == 'POST':
-        form = Post(request.POST)
-        if form.is_valid():
-            title = form.cleaned_data["title"]
-            textarea = form.cleaned_data["textarea"]
-            if title in entries:
-                return render(request, "encyclopedia/error.html", {"message": "Page already exist"})
-            else:
-                util.save_entry(title, textarea)
-                page = util.get_entry(title)
-                page_converted = markdowner.convert(page)
-
-                context = {
-                    'page': page_converted,
-                    'title': title
-                }
-
-                return render(request, "encyclopedia/entry.html", context)
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+        if title in entries:
+            return render(request, "encyclopedia/error.html", {"message": "Page already exist"})
+        else:
+            util.save_entry(title, content)
+        return render(request, "encyclopedia/entry.html")
     else:
-        return render(request, "encyclopedia/add_page.html", {"post": Post()})
+        return render(request, "encyclopedia/add_page.html")
 
 def edit(request, title):
     if request.method == 'GET':
@@ -102,15 +92,8 @@ def edit(request, title):
         if form.is_valid():
             textarea = form.cleaned_data["textarea"]
             util.save_entry(title,textarea)
-            page = util.get_entry(title)
-            page_converted = markdowner.convert(page)
 
-            context = {
-                'page': page_converted,
-                'title': title
-            }
-
-            return render(request, "encyclopedia/entry.html", context)
+            return render(request, "encyclopedia/entry.html")
 
 def random(request):
 
@@ -123,4 +106,4 @@ def random(request):
         'page': page_converted,
         'title': page_random,
         }
-    return render(request, "encyclopedia/entry.html", context)
+    return render(request, "encyclopedia/random.html", context)

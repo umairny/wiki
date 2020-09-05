@@ -5,12 +5,15 @@ Add New entry
 {% endblock %}
 
 {% block body %}
-  <form method="post" action="{% url 'add_page' %}">
+  <form method="post">
     {% csrf_token %}
-      <h3>Create new page:</h3>
-      <h6 class="post-title">Title: {{post.title}}</h6>
-      <h6 class="post-content">Contents: </h6>
-      {{post.textarea}}
+      <h2>Create new page:</h2>
+      
+      <h4>Title:</h4>
+      <input type="text" name="title" placeholder="Enter title of page">
+      
+      <h4>Content: </h4>
+      <textarea name="content" rows="1"></textarea>
         
       <br>
         <input class="save btn btn-info" type="submit" value="Save"/>
