@@ -8,7 +8,6 @@ import re
 from markdown2 import Markdown
 
 markdowner = Markdown()
-entries = util.list_entries()
 
 class Post(forms.Form):
     title = forms.CharField(label= "Title")
@@ -19,6 +18,7 @@ class Edit(forms.Form):
 
 
 def index(request):
+    entries = util.list_entries()
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
@@ -26,6 +26,7 @@ def index(request):
 
 # Search logic
 def search(request):
+    entries = util.list_entries()
     query = request.GET.get('q').lower()
     entry = [item.lower() for item in entries]
     searchlist = []
@@ -52,6 +53,7 @@ def search(request):
 
 # Entry page 
 def entry(request, title):
+    entries = util.list_entries()
     if title in entries:
         page = util.get_entry(title)
         page_converted = markdowner.convert(page)
@@ -65,6 +67,7 @@ def entry(request, title):
 
 #Creat New page entry
 def add_page(request):
+    entries = util.list_entries()
     if request.method == 'POST':
         title = request.POST.get("title")
         content = request.POST.get("content")
@@ -72,31 +75,28 @@ def add_page(request):
             return render(request, "encyclopedia/error.html", {"message": "Page already exist"})
         else:
             util.save_entry(title, content)
-        return render(request, "encyclopedia/entry.html")
+            return render(request, "encyclopedia/index.html")
     else:
         return render(request, "encyclopedia/add_page.html")
 
 def edit(request, title):
+    entries = util.list_entries()
     if request.method == 'GET':
         page = util.get_entry(title)
-        
         context = {
-            
-            'edit': Edit(initial={'textarea': page}),
-            'title': title
+            'title': title,
+            'edit': Edit(initial={'textarea': page})
         }
-
         return render(request, "encyclopedia/edit.html", context)
     else:
         form = Edit(request.POST) 
         if form.is_valid():
-            textarea = form.cleaned_data["textarea"]
-            util.save_entry(title,textarea)
-
-            return render(request, "encyclopedia/entry.html")
+            content = form.cleaned_data["textarea"]
+            util.save_entry(title, content)
+            return render(request, "encyclopedia/index.html")
 
 def random(request):
-
+    entries = util.list_entries()
     num = randint(0, len(entries) - 1)
     page_random = entries[num]
     

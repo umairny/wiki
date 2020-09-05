@@ -7,7 +7,7 @@
 {% block body %}
     <form method="POST">
         {% csrf_token %}
-        <h2>Edit: {{title}}</h2>
+        <h2>Edit {{title}} file</h2>
             {{edit}}
         <br>
         <input class="save btn btn-info" type="submit" value="Save"/>
