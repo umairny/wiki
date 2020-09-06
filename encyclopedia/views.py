@@ -18,7 +18,6 @@ class Edit(forms.Form):
 
 
 def index(request):
-    entries = util.list_entries()
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
@@ -75,7 +74,9 @@ def add_page(request):
             return render(request, "encyclopedia/error.html", {"message": "Page already exist"})
         else:
             util.save_entry(title, content)
-            return render(request, "encyclopedia/index.html")
+
+            return redirect(entry, title=title)
+            #return render(request, "encyclopedia/entry.html", context)
     else:
         return render(request, "encyclopedia/add_page.html")
 
@@ -85,15 +86,17 @@ def edit(request, title):
         page = util.get_entry(title)
         context = {
             'title': title,
-            'edit': Edit(initial={'textarea': page})
+            'content': page
         }
         return render(request, "encyclopedia/edit.html", context)
-    else:
-        form = Edit(request.POST) 
-        if form.is_valid():
-            content = form.cleaned_data["textarea"]
-            util.save_entry(title, content)
-            return render(request, "encyclopedia/index.html")
+    elif request.method == 'POST':
+        newcontent = request.POST.get('newcontent')
+        util.save_entry(title, newcontent)
+        
+        return redirect(entry, title=title)
+        #return render(request, "encyclopedia/index.html", context)
+
+
 
 def random(request):
     entries = util.list_entries()

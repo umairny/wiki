@@ -8,7 +8,9 @@
     <form method="POST">
         {% csrf_token %}
         <h2>Edit {{title}} file</h2>
-            {{edit}}
+        <h4>Content: </h4>
+        <textarea name="newcontent" rows="1">{{ content }}</textarea>
+      
         <br>
         <input class="save btn btn-info" type="submit" value="Save"/>
     </form>
