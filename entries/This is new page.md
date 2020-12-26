@@ -1,3 +1,0 @@
-#Heading
-Some 
-*Text here

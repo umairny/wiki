@@ -5,17 +5,17 @@ from random import randint
 import re
 
 
-from markdown2 import Markdown
+from markdown2 import Markdown, markdown
 
 markdowner = Markdown()
 
-class Post(forms.Form):
-    title = forms.CharField(label= "Title")
-    textarea = forms.CharField(widget=forms.Textarea(), label='')
+#class Post(forms.Form):
+#    title = forms.CharField(label= "Title")
+#    textarea = forms.CharField(widget=forms.Textarea(), label='')
 
-class Edit(forms.Form):
-    textarea = forms.CharField(widget=forms.Textarea(), label='')
-
+#class Edit(forms.Form):
+#    textarea = forms.CharField(widget=forms.Textarea(), label='')
+    
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -69,11 +69,12 @@ def add_page(request):
     entries = util.list_entries()
     if request.method == 'POST':
         title = request.POST.get("title")
-        content = request.POST.get("content")
+        #content = request.POST.get("content")
+
         if title in entries:
             return render(request, "encyclopedia/error.html", {"message": "Page already exist"})
         else:
-            util.save_entry(title, content)
+            util.save_entry(title, bytes(request.POST['content'], 'utf8'))
 
             return redirect(entry, title=title)
             #return render(request, "encyclopedia/entry.html", context)
@@ -90,8 +91,8 @@ def edit(request, title):
         }
         return render(request, "encyclopedia/edit.html", context)
     elif request.method == 'POST':
-        newcontent = request.POST.get('newcontent')
-        util.save_entry(title, newcontent)
+        #newcontent = request.POST.get('newcontent')
+        util.save_entry(title, bytes(request.POST['newcontent'], 'utf8'))
         
         return redirect(entry, title=title)
         #return render(request, "encyclopedia/index.html", context)
